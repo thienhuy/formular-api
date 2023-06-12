@@ -9,7 +9,7 @@ export interface IConstructor extends Document {
 }
 
 export type ConstructorObject = {
-  _id: number;
+  _id?: number;
   name?: string | undefined;
   constructorRef?: string | undefined;
   nationality?: string | undefined;
@@ -17,7 +17,7 @@ export type ConstructorObject = {
 };
 
 export type ContructorFilterObject = {
-  _id: number;
+  _id?: number;
   name?: string | undefined;
   constructorRef?: string | undefined;
   nationality?: string | undefined;
@@ -27,7 +27,7 @@ export type ContructorFilterObject = {
 const ConstructorSchema: Schema = new Schema({
   _id: { type: Schema.Types.Number },
   name: { type: Schema.Types.String },
-  constructorRef: { type: Schema.Types.Number },
+  constructorRef: { type: Schema.Types.String },
   nationality: { type: Schema.Types.String },
   url: { type: Schema.Types.String },
 });

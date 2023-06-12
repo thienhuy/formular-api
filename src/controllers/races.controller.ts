@@ -1,2 +1,2 @@
 import { Request, Response } from "express";
-import * as raceRepo from "../repositories/reaces.repo";
+import * as raceRepo from "../repositories/races.repo";

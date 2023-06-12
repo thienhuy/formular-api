@@ -247,3 +247,238 @@ export const getDataAllTeam = (arrRaceId, arrConstructorId) => {
     { $unwind: "$constructor" },
   ]);
 };
+
+export const getResultByRaceIdAndConstructor = (arrRaceId, constructorId) => {
+  return Results.aggregate([
+    {
+      $match: {
+        $expr: {
+          $and: [
+            { $in: ["$raceId", arrRaceId] },
+            { $eq: ["$constructorId", constructorId] },
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          constructor: "$constructorId",
+          race: "$raceId",
+        },
+        constructorId: { $first: "$constructorId" },
+        raceId: { $first: "$raceId" },
+        totalPoint: {
+          $sum: {
+            $toInt: "$points",
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "races",
+        let: {
+          race_id: "$raceId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$race_id", "$_id"],
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "circuits",
+              let: {
+                circuit_id: "$circuitId",
+              },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $eq: ["$$circuit_id", "$_id"],
+                    },
+                  },
+                },
+              ],
+              as: "circuit",
+            },
+          },
+          {
+            $project: {
+              date: 1,
+              circuit: { country: 1 },
+            },
+          },
+          { $unwind: "$circuit" },
+        ],
+        as: "race",
+      },
+    },
+    { $unwind: "$race" },
+  ]);
+};
+
+export const getResultByRaceIdAndDriver = (arrRaceId, driverId) => {
+  return Results.aggregate([
+    {
+      $match: {
+        $expr: {
+          $and: [
+            { $in: ["$raceId", arrRaceId] },
+            { $eq: ["$driverId", driverId] },
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          constructor: "$driverId",
+          race: "$raceId",
+        },
+        constructorId: { $first: "$constructorId" },
+        raceId: { $first: "$raceId" },
+        position: { $first: "$position" },
+        totalPoint: {
+          $sum: {
+            $toInt: "$points",
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "constructors",
+        let: {
+          constructor_id: "$constructorId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$constructor_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+            },
+          },
+        ],
+        as: "constructor",
+      },
+    },
+    { $unwind: "$constructor" },
+    {
+      $lookup: {
+        from: "races",
+        let: {
+          race_id: "$raceId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$race_id", "$_id"],
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "circuits",
+              let: {
+                circuit_id: "$circuitId",
+              },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $eq: ["$$circuit_id", "$_id"],
+                    },
+                  },
+                },
+              ],
+              as: "circuit",
+            },
+          },
+          {
+            $project: {
+              date: 1,
+              circuit: { country: 1 },
+            },
+          },
+          { $unwind: "$circuit" },
+        ],
+        as: "race",
+      },
+    },
+    { $unwind: "$race" },
+  ]);
+};
+
+export const getRaceResult = (raceId: number) => {
+  return Results.aggregate([
+    {
+      $match: {
+        $expr: {
+          $and: [{ $eq: ["$raceId", raceId] }],
+        },
+      },
+    },
+    { $sort: { points: -1 } },
+    {
+      $lookup: {
+        from: "drivers",
+        let: {
+          driver_id: "$driverId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$driver_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              forename: 1,
+              surname: 1,
+            },
+          },
+        ],
+        as: "driver",
+      },
+    },
+    { $unwind: "$driver" },
+    {
+      $lookup: {
+        from: "constructors",
+        let: {
+          constructor_id: "$constructorId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$constructor_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+            },
+          },
+        ],
+        as: "constructor",
+      },
+    },
+    { $unwind: "$constructor" },
+  ]);
+};

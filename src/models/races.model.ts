@@ -6,7 +6,7 @@ export interface IRace extends Document {
   round: number;
   circuitId: number;
   name: string;
-  date: string;
+  date: Date;
   time: string;
   url: string;
   fp1_date: string;
@@ -27,7 +27,7 @@ export type RaceObject = {
   round?: number | undefined;
   circuitId?: number | undefined;
   name?: string | undefined;
-  date?: string | undefined;
+  date?: Date | undefined;
   time?: string | undefined;
   url?: string | undefined;
   fp1_date?: string | undefined;
@@ -48,7 +48,7 @@ export type RaceFilterObject = {
   round?: number | undefined;
   circuitId?: number | undefined;
   name?: string | undefined;
-  date?: string | undefined;
+  date?: Date | undefined;
   time?: string | undefined;
   url?: string | undefined;
   fp1_date?: string | undefined;
@@ -69,7 +69,7 @@ const RaceSchema: Schema = new Schema({
   round: { type: Schema.Types.Number },
   circuitId: { type: Schema.Types.Number },
   name: { type: Schema.Types.String },
-  date: { type: Schema.Types.String },
+  date: { type: Schema.Types.Date },
   time: { type: Schema.Types.String },
   url: { type: Schema.Types.String },
   fp1_date: { type: Schema.Types.String },
