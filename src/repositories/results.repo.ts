@@ -56,7 +56,6 @@ export const getAllResult = (arrRaceId) => {
         as: "constructor",
       },
     },
-
     { $unwind: "$constructor" },
     {
       $lookup: {
@@ -116,4 +115,135 @@ export const getAllResult = (arrRaceId) => {
   //   model: Constructors,
   //   select: { name: 1 },
   // });
+};
+
+export const getDataAllDriver = (arrDriverId, arrRaceId) => {
+  return Results.aggregate([
+    {
+      $match: {
+        $expr: {
+          $and: [
+            { $in: ["$raceId", arrRaceId] },
+            { $in: ["$driverId", arrDriverId] },
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          driver: "$driverId",
+          constructor: "$constructorId",
+        },
+        driverId: { $first: "$driverId" },
+        constructorId: { $first: "$constructorId" },
+        totalPoint: {
+          $sum: {
+            $toInt: "$points",
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "constructors",
+        let: {
+          constructor_id: "$constructorId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$constructor_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+            },
+          },
+        ],
+        as: "constructor",
+      },
+    },
+    { $unwind: "$constructor" },
+    {
+      $lookup: {
+        from: "drivers",
+        let: {
+          driver_id: "$driverId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$driver_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              forename: 1,
+              surname: 1,
+              nationality: 1,
+            },
+          },
+        ],
+        as: "driver",
+      },
+    },
+    { $unwind: "$driver" },
+  ]);
+};
+export const getDataAllTeam = (arrRaceId, arrConstructorId) => {
+  return Results.aggregate([
+    {
+      $match: {
+        $expr: {
+          $and: [
+            { $in: ["$raceId", arrRaceId] },
+            { $in: ["$constructorId", arrConstructorId] },
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          constructor: "$constructorId",
+        },
+        constructorId: { $first: "$constructorId" },
+        totalPoint: {
+          $sum: {
+            $toInt: "$points",
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "constructors",
+        let: {
+          constructor_id: "$constructorId",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$$constructor_id", "$_id"],
+              },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+            },
+          },
+        ],
+        as: "constructor",
+      },
+    },
+    { $unwind: "$constructor" },
+  ]);
 };

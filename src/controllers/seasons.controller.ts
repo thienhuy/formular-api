@@ -23,6 +23,7 @@ export const getBySeason = async (req: Request, res: Response) => {
     const year = Number(req.query.year);
     const type = req.query.type;
     const raceData = await raceRepo.getBySeason(year);
+    console.log(year, raceData);
     const arrRaceId = [];
     const arrCircultId = [];
     raceData.forEach((e) => {
@@ -36,14 +37,26 @@ export const getBySeason = async (req: Request, res: Response) => {
           arrRaceId
         );
         const arrDriverId = [];
-        driverStanding.forEach((e) => {
-          arrDriverId.push(e.driverId);
+        driverStanding.forEach((e: any) => {
+          arrDriverId.push(e.driverId._id);
         });
+
         const uniqueArrayDriver = arrDriverId.filter((item, pos, self) => {
           return self.indexOf(item) == pos;
         });
         const dataDriver = await driverRepo.getDriver(uniqueArrayDriver);
-        res.status(200).send({ status: "success", data: dataDriver, type });
+
+        const resultDriver = await resultRepo.getDataAllDriver(
+          uniqueArrayDriver,
+          arrRaceId
+        );
+
+        res.status(200).send({
+          status: "success",
+          data: dataDriver,
+          result: resultDriver,
+          type,
+        });
         break;
       case "teams":
         const constructorStanding =
@@ -58,9 +71,16 @@ export const getBySeason = async (req: Request, res: Response) => {
         const dataConstructor = await constructorRepo.getConstructor(
           uniqueArray
         );
-        res
-          .status(200)
-          .send({ status: "success", data: dataConstructor, type });
+        const resultConstructor = await resultRepo.getDataAllTeam(
+          arrRaceId,
+          uniqueArray
+        );
+        res.status(200).send({
+          status: "success",
+          data: dataConstructor,
+          result: resultConstructor,
+          type,
+        });
         break;
       default:
         const raceResult = await resultRepo.getAllResult(arrRaceId);
