@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"4bee712eb0da442a8f1743ca1bd00276","collectionName":"lap_times","type":"collection"}
