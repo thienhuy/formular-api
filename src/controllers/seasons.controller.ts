@@ -43,7 +43,7 @@ export const getBySeason = async (req: Request, res: Response) => {
         });
 
         const uniqueArrayDriver = arrDriverId.filter((item, pos, self) => {
-          return self.indexOf(item) == pos;
+          return self.indexOf(item) === pos;
         });
         const dataDriver = await driverRepo.getDriver(uniqueArrayDriver);
 
@@ -67,7 +67,7 @@ export const getBySeason = async (req: Request, res: Response) => {
           arrConstructorId.push(e.constructorId);
         });
         const uniqueArray = arrConstructorId.filter((item, pos, self) => {
-          return self.indexOf(item) == pos;
+          return self.indexOf(item) === pos;
         });
         const dataConstructor = await constructorRepo.getConstructor(
           uniqueArray
